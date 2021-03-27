@@ -1,6 +1,6 @@
 # # required preinstall packages: ape, tree, ggplot2, cowplot
 # # also see tree diagram paper (2020 Summer)
-# packages <- c("ggplot2","ape","cowplot","tree","stringr","spatstat","stats")
+# packages <- c("ggplot2","ape","cowplot","tree","stringr","stats")
 # # check for missing packages
 # installed_packages <- packages %in% rownames(installed.packages())
 # if (any(installed_packages == FALSE)) {
@@ -12,13 +12,12 @@
 
 # =====================get tree information function ==================================
 ## This function allows users to retrieve tree information to know how many density plots to draw and how to draw
-#' @importFrom spatstat is.empty
 #' @importFrom stringr str_remove
 #' @keywords internal
 tree_info <- function(dataset){
 
   # avoid empty dataset
-  if(is.empty(dataset)){stop("argument is of an empty dataset")}
+  if(dim(dataset)[1]==0|is.null(dataset)){stop("argument is of length zero")}
 
   # library(stringr)
 
@@ -58,7 +57,7 @@ newickToTree <- function(string){
   cat(string, file = "ex.tre", sep = "\n")
 
   # library(ape)
-  tree <- read.tree("ex.tre")
+  tree <- ape::read.tree("ex.tre")
 
   # Debug: stop if user typed in string with wrong Newick's format
   if(length(which(tree$node.label=="")==TRUE)!=0){
@@ -648,7 +647,7 @@ treeDiagram <- function(data,treedat,cat_var,filename,pic_height=10,pic_width=10
   # get list of sublist which records nodes along each hierarchy path from root to each terminal nodes
   all_nodes <- split_condition$node_index
   ls_node_num <- get_nodes_list(all_nodes)
-  # str(ls_node_num) #debug
+  # utils::str(ls_node_num) #debug
 
   # transform these node numbers to actual split conditions in character string
   # using a for loop to get all splitting conditions
@@ -656,7 +655,7 @@ treeDiagram <- function(data,treedat,cat_var,filename,pic_height=10,pic_width=10
   for (i in 1:length(ls_node_num)){
     conditions[[i]] <- get_subsets_cond(ls_node_num[[i]],split_condition)
   }
-  # str(conditions) #debug
+  # utils::str(conditions) #debug
 
   split_var=split_condition$var
   multi_densPlot(data,conditions,ls_node_num,split_var,cat_var,filename,pic_height,pic_width)
@@ -778,7 +777,6 @@ get_node_list_trf <- function(CutInfo){
 # @import ggplot2
 # @import cowplot
 # @import stringr
-# @importFrom utils str
 #
 # @keywords internal
 multi_densPlot_trf <- function(Cutinfo,response_var,ls_node_num=NULL,filename,pic_height=NULL,pic_width=NULL){
@@ -803,7 +801,7 @@ multi_densPlot_trf <- function(Cutinfo,response_var,ls_node_num=NULL,filename,pi
       combined_subset <- data.frame(rbind(subset1,subset2))
       combined_subset$label <- as.factor(combined_subset$label)
 
-      # print(str(combined_subset)) #debug
+      # print(utils::str(combined_subset)) #debug
 
       # plot picture separately
       cont_var <- "t.scale"
